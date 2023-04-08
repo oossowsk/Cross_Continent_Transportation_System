@@ -95,9 +95,8 @@ def dijsktraSearch(startNode,endNode,weight):
             #print("Distance to the index = " + str(node))
             # skip if node already used
             if (idx in usedDict):
-                print("skipping " + str(idx))
+                #print("skipping " + str(idx))
                 continue
-
             # check if it is smaller than current min dist
             if ((node < min or min == -1) and (node >= 0 )):
                 min = node
@@ -131,11 +130,10 @@ def dijsktraSearch(startNode,endNode,weight):
                 if (path[0] == prevTraverse and path[1] == pathDict[prevTraverse]['time'] and path[2] == pathDict[prevTraverse]['weight'] and path[3] == pathDict[prevTraverse]['transportType']):
                     #print("Update graph")
                     #print(graph[traverseNode][idx][2] - weight)
-                    graph[traverseNode][idx][2] = graph[traverseNode][idx][2] - weight
+                    graph[traverseNode][idx][2] = int(graph[traverseNode][idx][2] - weight)
             
-
         # send all in path list to update node
-        updateNodes()
+        updateNodes(graph)
         #print("updated graph = ")
         #print(graph)
     return pathDict, minDist
@@ -156,11 +154,12 @@ def stringToList(tmpStr):
 
     return stringArr
 
-def updateNodes():
+def updateNodes(graphNew):
     global channel
     global graph
+    graph = graphNew
     # make queues
-    for i in range(len(graph)):
+    for i in range(len(graphNew)):
     #    # queue to trigger dijkstra search on the node
         channel.queue_declare(queue=str(i))
         # queue to get result back
@@ -168,8 +167,21 @@ def updateNodes():
         # queue to update nodes with proper data
         channel.queue_declare(queue=str(i) + "_values")
 
-        outGoingNodes = str(graph[i])
+        outGoingNodes = str(graphNew[i])
         channel.basic_publish(exchange='', routing_key=str(i) + "_values", body=outGoingNodes)
+
+def createPikaConnections():
+    global channel
+    # create rabbitmq conenctions 
+    connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
+    tmpStr = str(graph[0])
+    tmpList = list(tmpStr)
+
+def returnGraph():
+    global graph
+    return graph
 
 graph = dict()
 graph[0] = [[1,10,34,'p'],[2,100,1000,'s']]
@@ -179,36 +191,26 @@ graph[3] = [[4,50,20,'t'],[1,54,32,'t']]
 graph[4] = [[5,5,100,'p'],[5,30,1000,'s']]
 graph[5] = [[2,30,10,'p'],[0,50,50,'t']]
 
-# create rabbitmq conenctions 
-connection = pika.BlockingConnection(
-pika.ConnectionParameters(host='localhost'))
-channel = connection.channel()
-tmpStr = str(graph[0])
-tmpList = list(tmpStr)
+createPikaConnections()
+updateNodes(graph)
 
-updateNodes()
+if __name__ == '__main__':
+    # run dijstra search using distributed nodes
+    pathDict, minDist = dijsktraSearch(0,2,30)
+    print("Path and min dist")
+    print(pathDict)
+    print(minDist)
 
-#print(stringArr)
+    print("New graph = ")
+    print(graph)
 
-#print(tmpList)
+    pathDict, minDist = dijsktraSearch(0,2,30)
+    print("Path and min dist")
+    print(pathDict)
+    print(minDist)
 
-
-# run dijstra search using distributed nodes
-pathDict, minDist = dijsktraSearch(0,2,30)
-print("Path and min dist")
-print(pathDict)
-print(minDist)
-
-print("New graph = ")
-print(graph)
-
-pathDict, minDist = dijsktraSearch(0,2,30)
-print("Path and min dist")
-print(pathDict)
-print(minDist)
-
-print("New graph = ")
-print(graph)
+    print("New graph = ")
+    print(graph)
 
 #https://pika.readthedocs.io/en/latest/modules/adapters/blocking.html?highlight=start_consuming
 
