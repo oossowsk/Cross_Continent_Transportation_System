@@ -89,24 +89,28 @@ async def createOrder(request: createOrderRequest):
     currentNode = endNode
     totalTime = 0
     returnDict = dict()
+    print("Min dist = ")
+    print(minDist)
+    if(minDist[endNode] != -1):
+        while (currentNode != startNode):
+            totalTime = totalTime + pathDict[currentNode]['time']
+            returnDict[currentNode] = pathDict[currentNode]
+            currentNode = pathDict[currentNode]['source']
+        returnDict['weight'] = nodeWeight
 
-    while (currentNode != startNode):
-        totalTime = totalTime + pathDict[currentNode]['time']
-        returnDict[currentNode] = pathDict[currentNode]
-        currentNode = pathDict[currentNode]['source']
-    returnDict['weight'] = nodeWeight
+        if (not email in userOrders):
+            userOrders[email] = list()
+            userOrders[email].append(-1)
 
-    if (not email in userOrders):
-        userOrders[email] = list()
-        userOrders[email].append(-1)
+        userOrders[email][0] = userOrders[email][0] + 1
+        returnDict['id'] = userOrders[email][0]
+        returnDict['endNode'] = endNode
+        returnDict['startNode'] = startNode
+        userOrders[email].append(returnDict)
 
-    userOrders[email][0] = userOrders[email][0] + 1
-    returnDict['id'] = userOrders[email][0]
-    returnDict['endNode'] = endNode
-    returnDict['startNode'] = startNode
-    userOrders[email].append(returnDict)
-
-    return {'Route': returnDict, 'time': totalTime}
+        return {'Route': returnDict, 'time': totalTime}
+    else:
+        return {'Route': "None", 'time': -1}
 
 
 @app.post('/login')

@@ -15,6 +15,8 @@ def stringToList(tmpStr):
         stringArr[idx] = re.sub(r'\s*', r'', stringArr[idx])
         stringArr[idx] = re.sub(r'\'', r'', stringArr[idx])
         stringArr[idx] = stringArr[idx].split(',')
+        print("Recieved string = ") 
+        print(stringArr[idx])
         stringArr[idx][0] = int(stringArr[idx][0])
         stringArr[idx][1] = int(stringArr[idx][1])
         stringArr[idx][2] = int(stringArr[idx][2])  

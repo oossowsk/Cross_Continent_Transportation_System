@@ -130,7 +130,7 @@
     </style>
     <title>Shipping Tracker</title>
 </head>
-<body onload="setUp()">
+<body onload="">
     <div class="title">
         <h1>Shipping Locations</h1>
         <p>
@@ -258,7 +258,7 @@
 
             console.log(fromServer);
 
-            document.getElementById("shipping-label").innerHTML = time + " Days";
+            document.getElementById("shipping-label").innerHTML = time/(3600*24) + " Days";
         })
 
         async function setUp() {
