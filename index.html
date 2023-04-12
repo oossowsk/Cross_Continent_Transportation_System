@@ -130,7 +130,7 @@
     </style>
     <title>Shipping Tracker</title>
 </head>
-<body>
+<body onload="setUp()">
     <div class="title">
         <h1>Shipping Locations</h1>
         <p>
@@ -139,7 +139,6 @@
     </div>
     <div class="container">
         <div class="map-container">
-            
             <img src="worldmap.png" alt="map"/>
             <div class="pin los-angeles">
                 <span onclick="setCity(this.innerText)">Los Angeles, US</span>
@@ -209,44 +208,45 @@
             localStorage.setItem("email", email);
 
             if (start == "New York City, US") {
-                start = 1;
+                start = 0;
             } else if (start == "Tokyo, JP") {
-                start = 2;
+                start = 1;
             } else if (start == "London, UK") {
-                start = 3;
+                start = 2;
             } else if (start == "Los Angeles, US") {
-                start = 4;
+                start = 3;
             } else if (start == "Cairo, EG") {
-                start = 5;
+                start = 4;
             } else if (start == "Paris, FR") {
-                start = 6;
+                start = 5;
             } else {
                 alert("No Originating Location Picked");
             }
 
             if (end == "New York City, US") {
-                end = 1;
+                end = 0;
             } else if (end == "Tokyo, JP") {
-                end = 2;
+                end = 1;
             } else if (end == "London, UK") {
-                end = 3;
+                end = 2;
             } else if (end == "Los Angeles, US") {
-                end = 4;
+                end = 3;
             } else if (end == "Cairo, EG") {
-                end = 5;
+                end = 4;
             } else if (end == "Paris, FR") {
-                end = 6;
+                end = 5;
             } else {
                 alert("No Final Location Picked");
             }
 
+            console.log(email + start + end + weight);
             const response = await fetch('http://127.0.0.1:8000/createOrder', {
                 method: "POST",
                 body: JSON.stringify(
                     {email: email, 
                     start: start, 
                     end: end, 
-                    weight: weight}),
+                    weight: parseInt(weight)}),
                 headers: {"Content-type": "application/json; charset=UTF-8"}
             })
 
@@ -256,8 +256,127 @@
             var route = fromServer['Route'];
             var time = fromServer['time'];
 
+            console.log(fromServer);
+
             document.getElementById("shipping-label").innerHTML = time + " Days";
         })
+
+        async function setUp() {
+            await fetch('http://127.0.0.1:8000/createNode', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 0}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+
+            await fetch('http://127.0.0.1:8000/createNode', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 1}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+            await fetch('http://127.0.0.1:8000/createNode', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 2}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+            await fetch('http://127.0.0.1:8000/createNode', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 3}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+            await fetch('http://127.0.0.1:8000/createNode', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 4}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+            await fetch('http://127.0.0.1:8000/createNode', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 5}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+            
+            await fetch('http://127.0.0.1:8000/addNodePath', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 0,
+                    endNode: 2,
+                    pathWeight: 110000000,
+                    pathType: "Ship",
+                    pathTime: 1468800}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+
+            await fetch('http://127.0.0.1:8000/addNodePath', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 2,
+                    endNode: 5,
+                    pathWeight: 5000,
+                    pathType: "Plane",
+                    pathTime: 4500}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+
+            await fetch('http://127.0.0.1:8000/addNodePath', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 1,
+                    endNode: 4,
+                    pathWeight: 110000000,
+                    pathType: "Ship",
+                    pathTime: 1468800}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+
+            await fetch('http://127.0.0.1:8000/addNodePath', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 0,
+                    endNode: 3,
+                    pathWeight: 12500000,
+                    pathType: "Train",
+                    pathTime: 281700}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+
+            await fetch('http://127.0.0.1:8000/addNodePath', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 3,
+                    endNode: 1,
+                    pathWeight: 110000000,
+                    pathType: "Ship",
+                    pathTime: 950400}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+
+            await fetch('http://127.0.0.1:8000/addNodePath', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 4,
+                    endNode: 5,
+                    pathWeight: 5000,
+                    pathType: "Plane",
+                    pathTime: 17100}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+
+            await fetch('http://127.0.0.1:8000/addNodePath', {
+                method: "POST",
+                body: JSON.stringify(
+                    {nodeNum: 5,
+                    endNode: 1,
+                    pathWeight: 5000,
+                    pathType: "Plane",
+                    pathTime: 29700}),
+                headers: {"Content-type": "application/json; charset=UTF-8"}
+            })
+        }
     </script>
 
 </body>
