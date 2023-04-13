@@ -34,7 +34,7 @@
 </head>
 <body onload="loadOrder()">
     <nav>
-        <a href="#">Home</a>
+        <a onclick="home()" href="http://127.0.0.1:8000/">Home</a>
     </nav>
     <h2 id="welcome-text" style="text-align: center;"></h2>
     <p id="weight-text" style="text-align: center;"></p>
@@ -70,6 +70,12 @@
         }
 
         document.getElementById('delivery-text').innerHTML = "<strong>Estimated delivery date: </strong>" + month + '/' + day + '/' + year;
+    }
+
+    async function home() {
+        await fetch('http://127.0.0.1:8000/', {
+            method: "GET"
+        })
     }
 </script>
 </html>

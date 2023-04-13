@@ -43,7 +43,7 @@
 </head>
 <body>
     <nav class="dark-blue">
-        <a href="/">Home</a>
+        <a onclick="home()" href="http://127.0.0.1:8000/">Home</a>
     </nav>
     <div class="container">
         <h2>Enter your email to check your order(s)</h2>
@@ -65,8 +65,12 @@
         await fetch('http://127.0.0.1:8000/viewOrderInfo', {
             method: "GET"
         })
-
-        
     })
+
+    async function home() {
+        await fetch('http://127.0.0.1:8000/', {
+            method: "GET"
+        })
+    }
 </script>
 </html>
