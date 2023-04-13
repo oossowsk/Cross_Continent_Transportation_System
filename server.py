@@ -36,17 +36,19 @@ def dijsktraSearch(startNode, endNode, weight):
     minDist[endNode] = -1
 
     current = startNode
-    #print("Start node = " + str(startNode))
-    #print("End node = " + str(endNode))
-    #print("Weight = "+ str(weight))
+    # print("Start node = " + str(startNode))
+    # print("End node = " + str(endNode))
+    # print("Weight = "+ str(weight))
     while (not current is None):
         print(current)
         # update queue for current node
         # send format -- weight
         message = str(weight)
-        channel.basic_publish(exchange='', routing_key=str(current), body=message)
+        channel.basic_publish(
+            exchange='', routing_key=str(current), body=message)
         # wait on response from queue on current node
-        channel.basic_consume(queue=str(current)+"_response",on_message_callback=waitOnNodeResponse, auto_ack=True)
+        channel.basic_consume(queue=str(current)+"_response",
+                              on_message_callback=waitOnNodeResponse, auto_ack=True)
         channel.start_consuming()
         # return format -- [destLoc1;destTime1;destWeight1;outGoingNodes1],[destLoc2;destTime2;destWeight2;outGoingNodes2]
 
@@ -54,15 +56,15 @@ def dijsktraSearch(startNode, endNode, weight):
         # print("Weightlist recieved from node = " + str(current))
         # print(destinationList)
         for node in destinationList:
-            #print("Node recieved = ")
-            #print(node)
+            # print("Node recieved = ")
+            # print(node)
             destLoc = int(node[0])
             destTime = int(node[1])
 
             # time is equal to transport time + all before time
             destTime = destTime + minDist[current]
 
-            destWeight = int(node[2]) 
+            destWeight = int(node[2])
             destTransportType = node[3]
 
             update = False
@@ -124,8 +126,8 @@ def dijsktraSearch(startNode, endNode, weight):
         # prevTraverse = traverseNode
         # traverseNode = pathDict[traverseNode]['source']
         graphTmp = copy.deepcopy(graph)
-        #print("Graph tmp = ")
-        #print(graphTmp)
+        # print("Graph tmp = ")
+        # print(graphTmp)
         while (traverseNode != startNode):
             # print("TraverseNode = " + str(traverseNode))
             prevTraverse = traverseNode
@@ -158,7 +160,7 @@ def stringToList(tmpStr):
         stringArr[idx] = re.sub(r'\s*', r'', stringArr[idx])
         stringArr[idx] = re.sub(r'\'', r'', stringArr[idx])
         stringArr[idx] = stringArr[idx].split(',')
-       
+
         stringArr[idx][0] = int(stringArr[idx][0])
         stringArr[idx][1] = int(stringArr[idx][1])
         stringArr[idx][2] = int(stringArr[idx][2])
@@ -170,8 +172,8 @@ def updateNodes(graphNew):
     global channel
     global graph
     graph = graphNew
-    #print("Graph to update nodes = ")
-    #print(graphNew)
+    # print("Graph to update nodes = ")
+    # print(graphNew)
     # make queues
     for i in range(len(graphNew)):
         #    # queue to trigger dijkstra search on the node
@@ -181,16 +183,18 @@ def updateNodes(graphNew):
         # queue to update nodes with proper data
         channel.queue_declare(queue=str(i) + "_values")
 
-        if(str(graphNew[i]) == '[]'):
+        if (str(graphNew[i]) == '[]'):
             continue
         outGoingNodes = str(graphNew[i])
-        channel.basic_publish(exchange='', routing_key=str(i) + "_values", body=outGoingNodes)
+        channel.basic_publish(exchange='', routing_key=str(
+            i) + "_values", body=outGoingNodes)
 
 
 def createPikaConnections():
     global channel
     # create rabbitmq conenctions
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
 
 
@@ -200,17 +204,11 @@ def returnGraph():
     print(graph)
     return graph
 
-'''graph[0] = [[1,10,34,'p'],[2,100,1000,'s']]
-graph[1] = [[2,40,100,'p'],[4,70,150,'t']]
-graph[2] = [[3,10,80,'p'],[5,60,100,'t']]
-graph[3] = [[4,50,20,'t'],[1,54,32,'t']]
-graph[4] = [[5,5,100,'p'],[5,30,1000,'s']]
-graph[5] = [[2,30,10,'p'],[0,50,50,'t']]'''
 
 graph[0] = [[2, 1468800, 110000000, 'Ship'], [3, 281700, 12500000, 'Train']]
 graph[1] = [[4, 1468800, 110000000, 'Ship']]
 graph[2] = [[5, 4500, 5000, 'Plane']]
-graph[3] = [[1, 950400, 110000000, 'Ship']]
+graph[3] = [[1, 950400, 110000000, 'Ship'], [0, 281700, 12500000, 'Train']]
 graph[4] = [[5, 17100, 5000, 'Plane']]
 graph[5] = [[1, 29700, 5000, 'Plane']]
 

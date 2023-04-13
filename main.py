@@ -19,6 +19,7 @@ import copy
 app = FastAPI()
 
 templates = Jinja2Templates(directory="")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 origins = ["*"]
 app.add_middleware(
@@ -73,6 +74,22 @@ async def default(request: Request):
     return templates.TemplateResponse("index.html", context={"request": request})
 
 
+@app.get('/trackOrder')
+# client sends over start, end, weight and email
+# return is route and total time
+async def trackOrder(request: Request):
+    # return {"default": "test"}
+    return templates.TemplateResponse("order.html", context={"request": request})
+
+
+@app.get('/viewOrderInfo')
+# client sends over start, end, weight and email
+# return is route and total time
+async def viewOrderInfo(request: Request):
+    # return {"default": "test"}
+    return templates.TemplateResponse("user_home.html", context={"request": request})
+
+
 @app.post('/createOrder')
 # client sends over start, end, weight and email
 # return is route and total time
@@ -91,7 +108,7 @@ async def createOrder(request: createOrderRequest):
     returnDict = dict()
     print("Min dist = ")
     print(minDist)
-    if(minDist[endNode] != -1):
+    if (minDist[endNode] != -1):
         while (currentNode != startNode):
             totalTime = totalTime + pathDict[currentNode]['time']
             returnDict[currentNode] = pathDict[currentNode]

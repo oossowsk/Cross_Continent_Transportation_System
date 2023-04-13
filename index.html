@@ -139,7 +139,7 @@
     </div>
     <div class="container">
         <div class="map-container">
-            <img src="worldmap.png" alt="map"/>
+            <img src="{{ url_for('static', path='worldmap.png') }}" alt="map"/>
             <div class="pin los-angeles">
                 <span onclick="setCity(this.innerText)">Los Angeles, US</span>
             </div>
@@ -165,7 +165,7 @@
                 <h2 id="original-location">Select Origin on Map</h2>
             </div>
             <br>
-            <a href="order.html">Track Order</a> <br><br>
+            <br><br>
             <form id="shipping-form">
                 <label for="weight">Package Weight (kg):</label><br>
                 <input type="text" id="weight" name="weight" value="83"><br>
@@ -187,10 +187,18 @@
                 <input type="submit" id="ship-time" value="Estimate Shipping Time"/>
                 <h2 id="shipping-label" class="shipping-label"></h2>
             </form>
+            <a onclick="loadOrder()" href="http://127.0.0.1:8000/trackOrder">Track Order</a>
         </div>
     </div>
 
     <script>
+
+        async function loadOrder() {
+            await fetch('http://127.0.0.1:8000/trackOrder', {
+                method: "GET"
+            })
+        }
+
         function setCity(city) {
             localStorage.setItem("originating city", city);
             document.getElementById("original-location").innerHTML = city;
@@ -205,6 +213,7 @@
             var end = document.getElementById('destination').value;
             var weight = parseInt(document.getElementById('weight').value);
 
+            localStorage.setItem("weight", weight);
             localStorage.setItem("email", email);
 
             if (start == "New York City, US") {
@@ -254,11 +263,16 @@
             var fromServer = JSON.parse(responseText);
 
             var route = fromServer['Route'];
-            var time = fromServer['time'];
+            var time = fromServer['time']/(3600*24);
 
             console.log(fromServer);
 
-            document.getElementById("shipping-label").innerHTML = time/(3600*24) + " Days";
+            if (parseInt(fromServer['time']) < 0) {
+                document.getElementById("shipping-label").innerHTML = "No Available Path";
+            } else {
+                document.getElementById("shipping-label").innerHTML = time.toFixed(2) + " Days";
+                localStorage.setItem("days", parseInt(time.toFixed(0)))
+            }
         })
 
         async function setUp() {

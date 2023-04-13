@@ -32,18 +32,44 @@
             }
     </style>
 </head>
-<body>
+<body onload="loadOrder()">
     <nav>
         <a href="#">Home</a>
     </nav>
-    <h2 style="text-align: center;">Welcome back user234234cs3!</h2>
-    <p style="text-align: center;"><strong>Package weight:</strong> 0.23kg</p>
-    <p style="text-align: center;"><strong>Date shipped:</strong> 4/7/2023</p>
-    <p style="text-align: center;"><strong>Estimated delivery date:</strong> 4/27/2023</p>
+    <h2 id="welcome-text" style="text-align: center;"></h2>
+    <p id="weight-text" style="text-align: center;"></p>
+    <p id="shipped-text" style="text-align: center;"></p>
+    <p id="delivery-text" style="text-align: center;"></p>
 
     <!-- wrap image inside container to center -->
     <div class="image-container">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzz28ogZF-sxR-p-gZk6giNzJ6q2lVgwNI_l08duoTvs4ytmN4hbT2mjHhpUhRzE6Us1Y&usqp=CAU">
     </div>
 </body>
+<script>
+    function loadOrder() {
+        var email = localStorage.getItem("email");
+        var weight = localStorage.getItem("weight");
+        const date = new Date(); 
+
+        let year = date.getFullYear(); 
+        let month = date.getMonth(); 
+        let day = date.getDate(); 
+
+        document.getElementById('welcome-text').innerHTML = "Welcome back, " + email;
+        document.getElementById('weight-text').innerHTML = "<strong>Package weight: </strong>" + weight;
+        document.getElementById('shipped-text').innerHTML = "<strong>Date shipped: </strong> " + month + '/' + day + '/' + year;
+        
+        var addDate = localStorage.getItem("days");
+
+        if (parseInt(day) + parseInt(addDate) > 30) {
+            month = date.getMonth() + 1;
+            day = parseInt(day - 30) + parseInt(addDate);
+        } else {
+            day = parseInt(day) + parseInt(addDate);
+        }
+
+        document.getElementById('delivery-text').innerHTML = "<strong>Estimated delivery date: </strong>" + month + '/' + day + '/' + year;
+    }
+</script>
 </html>
