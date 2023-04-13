@@ -143,6 +143,7 @@ async def login():
 async def viewOrder(request: emailRequest):
     global userOrders
     email = request.email
+    print(email)
     if (email in userOrders):
         return {'orders': userOrders[email]}
     else:

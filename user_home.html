@@ -30,6 +30,10 @@
                 max-width: 100%;
                 max-height: 100%;
             }
+
+        .orders {
+            text-align: center;
+        }
     </style>
 </head>
 <body onload="loadOrder()">
@@ -40,6 +44,9 @@
     <p id="weight-text" style="text-align: center;"></p>
     <p id="shipped-text" style="text-align: center;"></p>
     <p id="delivery-text" style="text-align: center;"></p>
+    <div id="text-container" class="orders">
+
+    </div>
 
     <!-- wrap image inside container to center -->
     <div class="image-container">
@@ -47,29 +54,73 @@
     </div>
 </body>
 <script>
-    function loadOrder() {
-        var email = localStorage.getItem("email");
-        var weight = localStorage.getItem("weight");
-        const date = new Date(); 
-
-        let year = date.getFullYear(); 
-        let month = date.getMonth(); 
-        let day = date.getDate(); 
-
+    async function loadOrder() {
+        var email = localStorage.getItem("checkEmail");
         document.getElementById('welcome-text').innerHTML = "Welcome back, " + email;
-        document.getElementById('weight-text').innerHTML = "<strong>Package weight: </strong>" + weight;
-        document.getElementById('shipped-text').innerHTML = "<strong>Date shipped: </strong> " + month + '/' + day + '/' + year;
-        
-        var addDate = localStorage.getItem("days");
 
-        if (parseInt(day) + parseInt(addDate) > 30) {
-            month = date.getMonth() + 1;
-            day = parseInt(day - 30) + parseInt(addDate);
-        } else {
-            day = parseInt(day) + parseInt(addDate);
+        const response = await fetch('http://127.0.0.1:8000/viewOrders', {
+            method: "POST",
+            body: JSON.stringify({email: email}),
+            headers: {"Content-type": "application/json; charset=UTF-8"}
+        })
+
+        const responseText = await response.text();
+        var fromServer = JSON.parse(responseText);
+
+        var container = document.getElementById('text-container')
+        for (i = 0; i < Object.keys(fromServer['orders']).length - 1; i++) {
+            var totalTime = 0;
+            var order = document.createElement("p");
+            var start = document.createElement("p");
+            var end = document.createElement("p");
+            var weight = document.createElement("p");
+            var time = document.createElement("p");
+            //console.log(fromServer['orders'][i+1]);
+            for (j = 0; j < Object.keys(fromServer['orders'][i+1]).length - 4; j++) {
+                //console.log(fromServer['orders'][i+1][Object.keys(fromServer['orders'][i+1])[j]]);
+                totalTime += fromServer['orders'][i+1][Object.keys(fromServer['orders'][i+1])[j]]['time']/(3600*24);
+            }
+            //console.log("total Time" + Object.keys(fromServer['orders'][i+1]['weight']));
+            order.innerHTML = "<b>Order Number #" + (i + 1) + "</b>";
+            time.innerHTML = "Total Shipping Time: " + totalTime.toFixed(2) + " Days";
+            weight.innerHTML = "Package Weight: " + fromServer['orders'][i+1]['weight'];
+
+            if (parseInt(fromServer['orders'][i+1]['startNode']) == 0) {
+                start.innerHTML = "Originating From: New York City, US";
+            } else if (parseInt(fromServer['orders'][i+1]['startNode']) == 1) {
+                start.innerHTML = "Originating From: Tokyo, JP";
+            } else if (parseInt(fromServer['orders'][i+1]['startNode']) == 2) {
+                start.innerHTML = "Originating From: London, UK";
+            } else if (parseInt(fromServer['orders'][i+1]['startNode']) == 3) {
+                start.innerHTML = "Originating From: Los Angeles, US";
+            } else if (parseInt(fromServer['orders'][i+1]['startNode']) == 4) {
+                start.innerHTML = "Originating From: Cairo, EG";
+            } else if (parseInt(fromServer['orders'][i+1]['startNode']) == 5) {
+                start.innerHTML = "Originating From: Paris, FR";
+            }
+
+            if (parseInt(fromServer['orders'][i+1]['endNode']) == 0) {
+                end.innerHTML = "Destination: New York City, US";
+            } else if (parseInt(fromServer['orders'][i+1]['endNode']) == 1) {
+                end.innerHTML = "Destination: Tokyo, JP";
+            } else if (parseInt(fromServer['orders'][i+1]['endNode']) == 2) {
+                end.innerHTML = "Destination: London, UK";
+            } else if (parseInt(fromServer['orders'][i+1]['endNode']) == 3) {
+                end.innerHTML = "Destination: Los Angeles, US";
+            } else if (parseInt(fromServer['orders'][i+1]['endNode']) == 4) {
+                end.innerHTML = "Destination: Cairo, EG";
+            } else if (parseInt(fromServer['orders'][i+1]['endNode']) == 5) {
+                end.innerHTML = "Destination: Paris, FR";
+            }
+            
+            container.appendChild(order);
+            container.appendChild(start);
+            container.appendChild(end);
+            container.appendChild(time);
+            container.appendChild(weight);
+            container.appendChild(document.createElement("br"));
         }
-
-        document.getElementById('delivery-text').innerHTML = "<strong>Estimated delivery date: </strong>" + month + '/' + day + '/' + year;
+        
     }
 
     async function home() {

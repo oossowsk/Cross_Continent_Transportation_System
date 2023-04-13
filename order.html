@@ -62,6 +62,7 @@
 <script>
     document.getElementById("check-order").addEventListener("click", async function(e) {
         //e.preventDefault();
+        localStorage.setItem("checkEmail", document.getElementById("email").value);
         await fetch('http://127.0.0.1:8000/viewOrderInfo', {
             method: "GET"
         })
